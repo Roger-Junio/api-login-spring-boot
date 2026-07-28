@@ -15,15 +15,13 @@ public class Cliente {
         @Column(unique = true)
         private String cpf;
 
+        @Column(unique = true)
+        private String email;
+
         private String senha;
 
-        @Column(unique = true)
-        private String numeroConta;
+        
 
-        private String agencia;
-        private BigDecimal saldo;
-
-   
         public Cliente() {
     }
 
@@ -35,15 +33,11 @@ public class Cliente {
     public String getCpf() {return cpf;}
         public void setCpf(String cpf) {this.cpf = cpf;}
 
+    public String getEmail() {return email;}
+        public void setEmail(String email) {this.email = email;}      
+
     public String getSenha() {return senha;}
         public void setSenha(String senha) {this.senha = senha;}
 
-    public String getNumeroConta() {return numeroConta;}
-        public void setNumeroConta(String numeroConta) {this.numeroConta = numeroConta;}
-
-    public String getAgencia() {return agencia;}
-        public void setAgencia(String agencia) {this.agencia = agencia;}
-
-    public BigDecimal getSaldo() {return saldo;}
-        public void setSaldo(BigDecimal saldo) {this.saldo = saldo;}
+      
 }

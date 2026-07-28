@@ -1,13 +1,15 @@
 package com.example.projeto_bancario_spring.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.dto.LoginRequest;
 import com.example.projeto_bancario_spring.model.Cliente;
 import com.example.projeto_bancario_spring.service.ClienteService;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 
 
 @RestController
@@ -21,24 +23,25 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
     
+
+
     @PostMapping("/cadastrar")
-    public Cliente cadastrar(@RequestBody Cliente entity) {
-        
-        return clienteService.cadastrar(entity);
+    public ResponseEntity<?> cadastrar(@RequestBody Cliente entity) {
+
+        try {
+            Cliente cliente = clienteService.cadastrar(entity);
+            return ResponseEntity.ok(cliente);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 
-
-
-    
-    
     @PostMapping("/login")
-    public Cliente login(@RequestBody Cliente cliente) {
-        return clienteService.login(cliente.getCpf(), cliente.getSenha());
-}
-
-
-
+    public Cliente login(@RequestBody LoginRequest resquet) {
+        return clienteService.login(resquet.getLogin(), resquet.getSenha());
+    }
 
 }
     
