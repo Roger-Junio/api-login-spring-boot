@@ -3,6 +3,7 @@ package com.example.projeto_bancario_spring.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.dto.LoginRequest;
+import com.example.exception.ValidacaoException;
 import com.example.projeto_bancario_spring.model.Cliente;
 import com.example.projeto_bancario_spring.service.ClienteService;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,20 +24,20 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
     
-
-
     @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrar(@RequestBody Cliente entity) {
 
-        try {
-            Cliente cliente = clienteService.cadastrar(entity);
-            return ResponseEntity.ok(cliente);
+    try {
+        Cliente cliente = clienteService.cadastrar(entity);
+        return ResponseEntity.ok(cliente);
 
-        } catch (RuntimeException e) {
+    } catch (ValidacaoException e) {
+        return ResponseEntity.badRequest().body(e.getErros());
+    } 
+        catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
-
+}
 
     @PostMapping("/login")
     public Cliente login(@RequestBody LoginRequest resquet) {

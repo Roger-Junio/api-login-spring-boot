@@ -1,5 +1,23 @@
+//LIMPA ERROP
+function limparErros() {
+
+    document.getElementById("erroNome").textContent = "";
+    document.getElementById("erroCpf").textContent = "";
+    document.getElementById("erroEmail").textContent = "";
+    document.getElementById("erroSenha").textContent = "";
+
+    document.getElementById("campoNome").classList.remove("erro-input");
+    document.getElementById("campoCpf").classList.remove("erro-input");
+    document.getElementById("campoEmail").classList.remove("erro-input");
+    document.getElementById("campoSenha").classList.remove("erro-input");
+}
+
+
+
 //FUNÇÃO DE CADASTRO---------------------------
 function botaoCadastra() {
+    
+    limparErros();
 
     const campoNome = document.getElementById("campoNome").value;
     const campoCpf = document.getElementById("campoCpf").value;
@@ -32,12 +50,12 @@ function botaoCadastra() {
     body: JSON.stringify(packCadastroJson)
 
 })
-    .then(async response => {
+        .then(async response => {
 
         if (!response.ok) {
 
-            const mensagem = await response.text();
-            throw new Error(mensagem);
+            const erros = await response.json(); // ← Agora recebe um JSON
+            throw erros;
 
         }
 
@@ -50,11 +68,38 @@ function botaoCadastra() {
         window.location.href = "login.html";
 
     })
-    .catch(error => {
+    
+    
 
-        alert(error.message);
+   .catch(erros => {
 
-    });
+                console.log(erros);
+    limparErros();
+
+    if (erros.nome) {
+        document.getElementById("erroNome").textContent = erros.nome;
+        document.getElementById("campoNome").classList.add("erro-input");
+    }
+
+    if (erros.cpf) {
+        document.getElementById("erroCpf").textContent = erros.cpf;
+        document.getElementById("campoCpf").classList.add("erro-input");
+    }
+
+    if (erros.email) {
+        document.getElementById("erroEmail").textContent = erros.email;
+        document.getElementById("campoEmail").classList.add("erro-input");
+    }
+
+    if (erros.senha) {
+        document.getElementById("erroSenha").textContent = erros.senha;
+        document.getElementById("campoSenha").classList.add("erro-input");
+    }
+
+});
+
+
+
 
 }
 
@@ -96,3 +141,42 @@ function botaoLogin() {
         });
 
 }
+
+document.getElementById("campoNome").addEventListener("input", function () {
+
+    this.classList.remove("erro-input");
+    document.getElementById("erroNome").textContent = "";
+
+});
+
+document.getElementById("campoCpf").addEventListener("input", function () {
+
+    this.classList.remove("erro-input");
+    document.getElementById("erroCpf").textContent = "";
+
+});
+
+document.getElementById("campoEmail").addEventListener("input", function () {
+
+    this.classList.remove("erro-input");
+    document.getElementById("erroEmail").textContent = "";
+
+});
+
+document.getElementById("campoSenha").addEventListener("input", function () {
+
+    this.classList.remove("erro-input");
+    document.getElementById("erroSenha").textContent = "";
+});
+
+["Nome", "Cpf", "Email", "Senha"].forEach(campo => {
+
+    document.getElementById("campo" + campo).addEventListener("input", function () {
+
+        this.classList.remove("erro-input");
+        document.getElementById("erro" + campo).textContent = "";
+
+    });
+
+});
+

@@ -1,9 +1,12 @@
 package com.example.projeto_bancario_spring.service;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
+import com.example.exception.ValidacaoException;
 import com.example.projeto_bancario_spring.model.Cliente;
 import com.example.projeto_bancario_spring.repository.ClienteRepository;
 
@@ -17,39 +20,52 @@ private final ClienteRepository clienteRepository;
             this.clienteRepository = clienteRepository;
         }
 
-
 //CADASTRO ------------
       public Cliente cadastrar(Cliente cliente) {
 
-        //nome
-        String nome = cliente.getNomeCompleto().trim();
-        if (nome.split("\\s+").length < 2) {
-            throw new RuntimeException("Informe o nome completo.");
-        }
-        //cpf
-        if (!cliente.getCpf().matches("\\d{11}")) {
-            throw new RuntimeException("O CPF deve conter exatamente 11 números.");
-        }
-        //senha
-        if (cliente.getSenha().length() < 8) {
-            throw new RuntimeException("A senha deve conter no mínimo 8 caracteres.");
-        }
+    Map<String, String> erros = new HashMap<>();
 
-    Optional<Cliente> clienteCpf = clienteRepository.findByCpf(cliente.getCpf());
-    Optional<Cliente> clienteEmail = clienteRepository.findByEmail(cliente.getEmail());
-
-    if (clienteCpf.isPresent()) {
-        throw new RuntimeException("Cpf já cadastrado.");
+    //Nome
+    String nome = cliente.getNomeCompleto().trim();
+    if (nome.split("\\s+").length < 2) {
+        erros.put("nome", "Informe o nome completo.");
     }
 
-    if (clienteEmail.isPresent()) {
-        throw new RuntimeException("E-mail já cadastrado.");
+    //CPF
+    if (!cliente.getCpf().matches("\\d{11}")) {
+        erros.put("cpf", "O CPF deve conter exatamente 11 números.");
+    }
+
+    //E-mail
+    if (!cliente.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        erros.put("email", "Informe um e-mail válido.");
+    }
+
+    //Senha
+    if (cliente.getSenha().length() < 8) {
+        erros.put("senha", "A senha deve conter no mínimo 8 caracteres.");
+    }
+
+    // Verifica CPF duplicado somente se o CPF já passou na validação
+    if (!erros.containsKey("cpf") &&
+            clienteRepository.findByCpf(cliente.getCpf()).isPresent()) {
+
+        erros.put("cpf", "CPF já cadastrado.");
+    }
+
+    // Verifica e-mail duplicado somente se o e-mail já passou na validação
+    if (!erros.containsKey("email") &&
+            clienteRepository.findByEmail(cliente.getEmail()).isPresent()) {
+
+        erros.put("email", "E-mail já cadastrado.");
     }
  
+    if (!erros.isEmpty()) {
+                throw new ValidacaoException(erros);
+            }
+
     return clienteRepository.save(cliente);
 }
-
-
 
 //LOGIN ----------------------
 public Cliente login(String login, String senha) {
